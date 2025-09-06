@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumbrado público de Aguascalientes</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    
+    <header>
+        <h1>Alumbrado Público de Aguascalientes</h1>
+        <img src="Aguascalientes.png" alt="Logo" class="header-logo">
+    </header> 
+
+    <main> 
+        <section class="reporte-banner">
+            <h1>Información del reporte</h1>
+        </section>
+
+        <section id="Información del reporte">
+            <form id="reporteForm">
+  <fieldset>
+    <legend>Datos del ciudadano</legend>
+    <label for="nombres">Nombres:</label>
+    <input type="text" id="nombres" name="nombres" required>
+
+    <label for="apellidos">Apellidos:</label>
+    <input type="text" id="apellidos" name="apellidos" required>
+
+    <label for="Telefono">Teléfono:</label>
+    <input type="tel" id="Telefono" name="Telefono" required>
+  </fieldset>
+
+  <fieldset>
+    <legend>Ubicación del reporte</legend>
+    <label for="ubicacion">Colonia o Fraccionamiento:</label>
+    <input list="colonias" id="ubicacion" name="ubicacion" required>
+    <datalist id="colonias"></datalist>
+
+<label for="calle">Calle principal:</label>
+<input list="callesList" id="calle" name="calle" required>
+<datalist id="callesList"></datalist>
+
+
+    <label for="entreCalles">Entre qué calles:</label>
+    <input list="entreCalles" id="entreCalles" name="entreCalles" required>
+
+    <label for="CodigoPostal">Código Postal:</label>
+<input list="codigosPostales" id="CodigoPostal" name="CodigoPostal" required readonly>
+<datalist id="codigosPostales"></datalist>
+
+
+  </fieldset>
+
+  <fieldset>
+
+    <legend>Detalles del reporte</legend>
+    <label for="Pregunta">¿Tiene varias luminarias defectuosas?</label>
+    <select id="Pregunta" name="Pregunta" required>
+      <option value="" disabled selected>Seleccione una opción</option>
+      <option value="Sí">Sí</option>
+      <option value="No">No</option>
+    </select>
+
+    <label for="Cantidad">Cantidad de luminarias defectuosas:</label>
+    <input type="number" id="Cantidad" name="Cantidad" min="1" required>
+
+    <label for="Tiempo">Tiempo que han estado defectuosas:</label>
+    <input type="text" id="Tiempo" name="Tiempo" required>
+  </fieldset>
+
+  <fieldset>
+
+    <legend>Adjuntar evidencia</legend>
+    <label for="Imagen">Imagen de referencia:</label>
+    <input type="file" id="Imagen" name="Imagen" accept="image/*" required>
+
+    <label for="PosibleFalla">Posible Falla:</label>
+    <input list="fallasList" id="PosibleFalla" name="PosibleFalla" required>
+    <datalist id="fallasList"></datalist>
+
+    <label for="descripcion">Descripción de la falla:</label>
+    <textarea id="descripcion" name="descripcion" required></textarea>
+
+  </fieldset>
+
+  <button type="submit">Enviar reporte</button>
+
+      </form>
+
+      <section class="imagen-add">
+  <img src="Alumbrado.jpg" alt="Imagen de Alumbrado" class="imagen-add-logo">
+</section>
+        </section>
+        
+        
+    </main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+  function obtenerFolio() {
+    let folioActual = localStorage.getItem("folioReporte");
+    folioActual = folioActual ? parseInt(folioActual, 10) : 0;
+    const folioFormateado = folioActual.toString().padStart(5, "0");
+    localStorage.setItem("folioReporte", folioActual + 1);
+    return folioFormateado;
+  }
+
+  function obtenerFechaHora() {
+    return new Date().toLocaleString("es-MX", {
+      timeZone: "America/Mexico_City",
+      hour12: false
+    });
+  }
+
+  function obtenerTurnoAutomatico() {
+    const hora = new Date().getHours();
+    if (hora >= 6 && hora < 14) return "Matutino";
+    if (hora >= 14 && hora < 22) return "Vespertino";
+    return "Nocturno";
+  }
+
+  function obtenerDatosFormulario(folio, fechaHoraEnvio, turno) {
+    return {
+      "Folio": folio,
+      "Fecha y hora de envío": fechaHoraEnvio,
+      "Nombre(s)": document.getElementById("nombres").value,
+      "Apellido(s)": document.getElementById("apellidos").value,
+      "Teléfono": document.getElementById("Telefono").value,
+      "Ubicación": document.getElementById("ubicacion").value,
+      "Calle": document.getElementById("calle").value,
+      "Entre calles": document.getElementById("entreCalles").value,
+      "Código Postal": document.getElementById("CodigoPostal").value,
+      "¿Hay varias luminarias dañadas?": document.getElementById("Pregunta").value,
+      "Cantidad de luminarias": document.getElementById("Cantidad")?.value || "N/A",
+      "Tiempo dañadas": document.getElementById("Tiempo")?.value || "N/A",
+      "Tipo de falla": document.getElementById("PosibleFalla").value,
+      "Descripción del problema": document.getElementById("descripcion").value,
+      "Turno asignado": turno,
+    };
+  }
+
+  function validarCamposObligatorios() {
+    const campos = [
+      "nombres", "apellidos", "Telefono", "ubicacion", "calle", "entreCalles",
+      "CodigoPostal", "Pregunta", "Cantidad", "Tiempo", "PosibleFalla", "descripcion"
+    ];
+    const faltantes = campos.filter(id => !document.getElementById(id)?.value.trim());
+    return faltantes;
+  }
+
+  function generarExcel(datos) {
+    const hoja = XLSX.utils.json_to_sheet([datos]);
+    hoja['!cols'] = Object.keys(datos).map(key => ({
+      wch: Math.max(key.length, datos[key]?.length || 10)
+    }));
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Reporte");
+    XLSX.writeFile(libro, `reporte_iluminacion_${datos.Folio}.xlsx`);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("reporteForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const faltantes = validarCamposObligatorios();
+      if (faltantes.length > 0) {
+        alert("Por favor completa todos los campos requeridos.");
+        return;
+      }
+
+      const folio = obtenerFolio();
+      const fechaHoraEnvio = obtenerFechaHora();
+      const turno = obtenerTurnoAutomatico();
+      const datosFormulario = obtenerDatosFormulario(folio, fechaHoraEnvio, turno);
+
+      try {
+        generarExcel(datosFormulario);
+        alert(`Reporte generado con folio ${folio} y turno ${turno}`);
+      } catch (error) {
+        console.error("Error al generar el Excel:", error);
+        alert("Hubo un problema al generar el archivo. Verifica los datos e intenta nuevamente.");
+      }
+    });
+  });
+</script>
+ 
+<script>
+async function cargarColonias() {
+  const res = await fetch('colonias.json');
+  const colonias = await res.json();
+  const datalist = document.getElementById('colonias');
+  colonias.forEach(colonia => {
+    const option = document.createElement('option');
+    option.value = colonia;
+    datalist.appendChild(option);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  cargarColonias();
+  cargarFallas();
+
+  document.getElementById('ubicacion').addEventListener('change', async function () {
+    const colonia = this.value;
+
+    const callesRes = await fetch('calles.json');
+    const callesData = await callesRes.json();
+    const calles = callesData[colonia] || [];
+
+    const callesList = document.getElementById('callesList');
+    callesList.innerHTML = '';
+    calles.forEach(calle => {
+      const option = document.createElement('option');
+      option.value = calle;
+      callesList.appendChild(option);
+    });
+
+    const cpRes = await fetch('codigos_postales.json');
+    const cpData = await cpRes.json();
+    const cp = cpData[colonia];
+    const cpList = document.getElementById('codigosPostales');
+    cpList.innerHTML = '';
+    if (cp) {
+      const option = document.createElement('option');
+      option.value = cp;
+      cpList.appendChild(option);
+      document.getElementById('CodigoPostal').value = cp;
+    }
+  });
+});
+
+async function cargarFallas() {
+  const res = await fetch('fallas.json');
+  const fallas = await res.json();
+  const datalist = document.getElementById('fallasList');
+  fallas.forEach(falla => {
+    const option = document.createElement('option');
+    option.value = falla;
+    datalist.appendChild(option);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  cargarFallas();
+});
+</script>
+</body>
+</html>

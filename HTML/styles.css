@@ -1,0 +1,123 @@
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilo general del cuerpo */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #ffffff;
+  line-height: 1.6;
+}
+
+/* Encabezado azul con texto blanco e imagen a la derecha */
+header {
+  background-color: #05036e;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+header h1 {
+  font-size: 48px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.header-logo {
+  width: 100px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Banner del reporte */
+.reporte-banner {
+  background-color: #197fdf;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.reporte-banner h1 {
+  font-size: 28px;
+  color: white;
+  margin: 0;
+}
+
+/* Imagen decorativa */
+.imagen-add {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Asegura centrado vertical si hay altura */
+  margin: 40px auto;
+  text-align: center;
+}   
+
+.imagen-add-logo {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Formulario en doble columna con Grid */
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Campos que deben ocupar toda la fila */
+form textarea,
+form button,
+form input[type="file"] {
+  grid-column: span 2;
+}
+
+/* Etiquetas del formulario */
+form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Campos de entrada */
+form input,
+form textarea,
+form select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* Botón de envío */
+form button {
+  background-color: #df1919;
+  color: white;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;  
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #0e1f9c;
+}
+

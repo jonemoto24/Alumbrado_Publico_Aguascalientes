@@ -1,0 +1,12 @@
+{
+  "Centro": ["Madero", "Zaragoza", "Galeana", "Rivero y Gutiérrez"],
+  "Del Valle": ["Av. Universidad", "Sierra de las Palomas", "Cerro del Muerto"],
+  "Insurgentes": ["Av. Aguascalientes", "José María Chávez", "Héroe de Nacozari"],
+  "La Cañada": ["Av. Constitución", "Calle Hidalgo", "Morelos", "Juárez"],
+  "El Llano": ["Calle A", "Calle B", "Calle C"],
+  "Arboledas": ["Av. del Bosque", "Calle Fresno", "Calle Roble"],
+  "San Isidro": ["Calle 1", "Calle 2", "Calle 3"],
+  "Los Romo": ["Av. Romo", "Benito Juárez", "Independencia"],
+  "Lomas del Cobano": ["Calle Loma Alta", "Calle Loma Baja"]
+
+}
